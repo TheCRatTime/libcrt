@@ -17,12 +17,13 @@
 #ifndef LIBCRT_LIBCRT_H_
 #define LIBCRT_LIBCRT_H_
 
-#define CRT_VERSION "1.0.0"
-#define CRT_VERSION_NUM 010000L
+#define CRT_VERSION "1.0.1"
+#define CRT_VERSION_NUM 010001L
 
 #if !defined(CRT_MEM_ATEXIT) && \
     !defined(CRT_MEM_DBG_ALLOC) && \
     !defined(CRT_MEM_BLOCK_ALLOC) && \
+    !defined(CRT_MEM_GC_MALLOC) && \
     !defined(CRT_MEM_ARENA) && \
     !defined(CRT_ENCODINGS_HEX) && \
     !defined(CRT_ENCODINGS_RLE) && \

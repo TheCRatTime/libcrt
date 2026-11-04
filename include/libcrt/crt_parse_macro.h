@@ -21,8 +21,9 @@
 #ifdef CRT_ENABLE_ALL
 # define CRT_MEM_ATEXIT
 # define CRT_MEM_DBG_ALLOC
-# define CRT_MEM_ARENA
 # define CRT_MEM_BLOCK_ALLOC
+# define CRT_MEM_GC_MALLOC
+# define CRT_MEM_ARENA
 # define CRT_ENCODINGS_HEX
 # define CRT_ENCODINGS_RLE
 #endif
@@ -30,6 +31,7 @@
 #ifdef CRT_NOT_USE_NAMESPACE
 # define ATEXIT_INC_PATH      "unsafe/mem/atexit.h"
 # define DBG_ALLOC_INC_PATH   "unsafe/mem/dbg_alloc.h"
+# define GC_MALLOC_INC_PATH   "unsafe/mem/GCmalloc.h"
 # define BLOCK_ALLOC_INC_PATH "unsafe/mem/block_alloc.h"
 # define ARENA_INC_PATH       "unsafe/mem/arena.h"
 # define HEX_INC_PATH         "unsafe/encodings/hex.h"
@@ -37,6 +39,7 @@
 #else
 # define ATEXIT_INC_PATH      "mem/atexit.h"
 # define DBG_ALLOC_INC_PATH   "mem/dbg_alloc.h"
+# define GC_MALLOC_INC_PATH   "mem/GCmalloc.h"
 # define BLOCK_ALLOC_INC_PATH "mem/block_alloc.h"
 # define ARENA_INC_PATH       "mem/arena.h"
 # define HEX_INC_PATH         "encodings/hex.h"
@@ -46,6 +49,7 @@
 #ifdef CRT_SOURCE
 # define ATEXIT_SOURCE
 # define DBG_ALLOC_SOURCE
+# define GC_MALLOC_SOURCE
 # define BLOCK_ALLOC_SOURCE
 # define ARENA_SOURCE
 
@@ -65,6 +69,10 @@
 
 #ifdef CRT_MEM_DBG_ALLOC
 # include DBG_ALLOC_INC_PATH
+#endif
+
+#ifdef CRT_MEM_GC_MALLOC
+# include GC_MALLOC_INC_PATH
 #endif
 
 #ifdef CRT_MEM_BLOCK_ALLOC
