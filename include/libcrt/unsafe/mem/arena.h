@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 
-/* -Weverything flag */
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic fatal "-Weverything"
-#pragma clang diagnostic fatal "-Wpedantic"
-#pragma clang diagnostic fatal "-Wall"
-#pragma clang diagnostic fatal "-Wextra"
-
-/* Error on 'buffer[i]' */
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-/* Error on "int var = (int)'6'" */
-#pragma clang diagnostic ignored "-Wold-style-cast"
-#endif
-
 /* === BEGIN HEADER === */
 
 #ifndef ARENA_ARENA_H_
@@ -253,8 +239,3 @@ static int BindID##id(Arena* arena) { \
 
 #endif /* NEEDED_BIND */
 /*********************************/
-
-/* -Weverything flag */
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#endif

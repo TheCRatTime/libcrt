@@ -26,6 +26,7 @@
 # define CRT_MEM_ARENA
 # define CRT_ENCODINGS_HEX
 # define CRT_ENCODINGS_RLE
+# define CRT_ERRORS_CERRORS
 #endif
 
 #ifdef CRT_NOT_USE_NAMESPACE
@@ -36,6 +37,7 @@
 # define ARENA_INC_PATH       "unsafe/mem/arena.h"
 # define HEX_INC_PATH         "unsafe/encodings/hex.h"
 # define RLE_INC_PATH         "unsafe/encodings/RLE.h"
+# define CERRORS_INC_PATH     "unsafe/errors/cerrors.h"
 #else
 # define ATEXIT_INC_PATH      "mem/atexit.h"
 # define DBG_ALLOC_INC_PATH   "mem/dbg_alloc.h"
@@ -44,6 +46,7 @@
 # define ARENA_INC_PATH       "mem/arena.h"
 # define HEX_INC_PATH         "encodings/hex.h"
 # define RLE_INC_PATH         "encodings/RLE.h"
+# define CERRORS_INC_PATH     "errors/cerrors.h"
 #endif
 
 #ifdef CRT_SOURCE
@@ -89,4 +92,8 @@
 
 #ifdef CRT_ENCODINGS_RLE
 # include RLE_INC_PATH
+#endif
+
+#ifdef CRT_ERRORS_CERRORS
+# include CERRORS_INC_PATH
 #endif

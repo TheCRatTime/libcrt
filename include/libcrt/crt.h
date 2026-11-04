@@ -27,6 +27,7 @@
     !defined(CRT_MEM_ARENA) && \
     !defined(CRT_ENCODINGS_HEX) && \
     !defined(CRT_ENCODINGS_RLE) && \
+    !defined(CRT_ERRORS_CERRORS) && \
     !defined(CRT_ENABLE_ALL) && \
     !defined(CRT_IMPORT) && \
     !defined(CRT_IMPORT2) && \
