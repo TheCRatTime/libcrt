@@ -68,14 +68,6 @@ void* GCMallocRaw(size_t size);
    Return value is malloc() function like. */
 void* GCMallocDep(size_t size, void* dep);
 
-/* Register pointer that will be saved in
-   GC collection. */
-void GCRegisterRoot(void* ptr);
-
-/* Unegister pointer that was registered by
-   GCRegisterRoot() */
-void GCUnregisterRoot(void* ptr);
-
 /* Add dependency DEP to PTR */
 void GCAddDependency(void* ptr, void* dep);
 
@@ -223,7 +215,7 @@ static void* GCMallocLogic(size_t size) {
   return (void*)((char*)ret + sizeof(GCObject));
 }
 
-void GCRegisterRoot(void* ptr) {
+static void GCRegisterRoot(void* ptr) {
   GCObject* obj = NULL;
   
   if (!ptr) {
@@ -239,7 +231,7 @@ void GCRegisterRoot(void* ptr) {
   gGCRoots = obj;
 }
 
-void GCUnregisterRoot(void* ptr) {
+static void GCUnregisterRoot(void* ptr) {
   GCObject* prev = NULL;
   GCObject* cur = gGCRoots;
 

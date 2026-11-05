@@ -72,14 +72,6 @@ void* CrtGCMallocRaw(size_t size);
    Return value is malloc() function like. */
 void* CrtGCMallocDep(size_t size, void* dep);
 
-/* Register pointer that will be saved in
-   GC collection. */
-void CrtGCRegisterRoot(void* ptr);
-
-/* Unegister pointer that was registered by
-   GCRegisterRoot() */
-void CrtGCUnregisterRoot(void* ptr);
-
 /* Add dependency DEP to PTR */
 void CrtGCAddDependency(void* ptr, void* dep);
 
@@ -228,7 +220,7 @@ static void* GCMallocLogic(size_t size) {
   return (void*)((char*)ret + sizeof(CrtGCObject));
 }
 
-void CrtGCRegisterRoot(void* ptr) {
+static void CrtGCRegisterRoot(void* ptr) {
   CrtGCObject* obj = NULL;
   
   if (!ptr) {
@@ -244,7 +236,7 @@ void CrtGCRegisterRoot(void* ptr) {
   gGCRoots = obj;
 }
 
-void CrtGCUnregisterRoot(void* ptr) {
+static void CrtGCUnregisterRoot(void* ptr) {
   CrtGCObject* prev = NULL;
   CrtGCObject* cur = gGCRoots;
 
