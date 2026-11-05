@@ -5,6 +5,10 @@
 
 #include <stdio.h>
 
+static void PtrHandler(void* ptr) {
+  printf("GC really freed %p\n", ptr);
+}
+
 typedef struct HardStruct {
   struct HardStruct* cycle_dep;
 } HardStruct;
@@ -19,6 +23,11 @@ static void TestFunc(void) {
   ptr1 = (HardStruct*)GCMalloc(sizeof(HardStruct));
   ptr2 = (HardStruct*)GCMallocRaw(sizeof(HardStruct)); /* No registering to roots */
   garbage = (HardStruct*)GCMalloc(sizeof(HardStruct)); /* unused */
+
+  /* If you want, you can set destructor, for example: */
+  GCRegDestructor(ptr1, PtrHandler);
+  GCRegDestructor(ptr2, PtrHandler);
+  GCRegDestructor(garbage, PtrHandler);
 
   GCAddDependency(ptr1, ptr2);
   GCAddDependency(ptr2, ptr1);

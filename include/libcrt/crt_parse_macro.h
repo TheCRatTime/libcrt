@@ -64,6 +64,7 @@
 
 # define LIBHEX_SOURCE
 # define RLE_SOURCE
+# define CERRORS_SOURCE
 #endif
 
 #ifdef CRT_MEM_ATEXIT

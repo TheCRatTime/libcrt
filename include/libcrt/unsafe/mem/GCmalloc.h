@@ -33,6 +33,9 @@
 /* GC unsigned char alias */
 typedef unsigned char GCu8;
 
+/* GC destructor function */
+typedef void (*GCDestructor)(void*);
+
 /* GCObject struct */
 typedef struct GCObject {
   void* raw_ptr;
@@ -40,6 +43,7 @@ typedef struct GCObject {
   struct GCObject* next_root;
   struct GCObject* next_grey;
   struct GCObject* next_dep;
+  GCDestructor destructor;
   char magic[GC_MAGIC_TOTAL];
   GCu8 metadata;
 } GCObject;
@@ -77,6 +81,10 @@ void GCAddDependency(void* ptr, void* dep);
 
 /* Collect garbage in program */
 void RunGC(void);
+
+/* Register destructor that will be called
+   when PTR is free */
+void GCRegDestructor(void* ptr, GCDestructor dsr);
 
 #define GC_INIT() \
   GCObject* gc__end_roots = gGCRoots
@@ -187,6 +195,7 @@ static void GCInitObject(GCObject* obj, void* ptr) {
     obj->next_root = NULL;
     obj->next_grey = NULL;
     obj->next_dep = NULL;
+    obj->destructor = NULL;
   }
 }
 
@@ -279,6 +288,10 @@ static void GCSweepStage(void) {
       cur = cur->next;
       if (prev) {
         prev->next = cur;
+      }
+
+      if (saved->destructor) {
+        saved->destructor(saved->raw_ptr);
       }
 
       free(saved);
@@ -457,6 +470,22 @@ void* GCMallocDep(size_t size, void* dep) {
 
 void* GCMallocRaw(size_t size) {
   return RealGCMalloc(size, GC_RAW, NULL);
+}
+
+void GCRegDestructor(void* ptr, GCDestructor dsr) {
+  GCObject* obj = NULL;
+  
+  if (!ptr || !dsr) {
+    return;
+  }
+  
+  obj = (GCObject*)(void*)((char*)ptr - sizeof(GCObject));
+
+  if (GCInvalidObj(obj)) {
+    return;
+  }
+
+  obj->destructor = dsr;
 }
 
 #endif /* GC_MALLOC_SOURCE */

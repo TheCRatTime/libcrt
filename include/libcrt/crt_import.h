@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#ifndef IMPORT_NOERROR
+#ifndef CRT_IMPORT_NOERROR
 # if !defined(CRT_IMPORT) && \
      !defined(CRT_IMPORT2) && \
      !defined(CRT_IMPORT3) && \
@@ -25,7 +25,7 @@
 # endif
 #endif
 
-#undef IMPORT_NOERROR
+#undef CRT_IMPORT_NOERROR
 
 #ifdef CRT_IMPORT
 # include CRT_IMPORT

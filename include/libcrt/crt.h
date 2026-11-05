@@ -17,8 +17,8 @@
 #ifndef LIBCRT_LIBCRT_H_
 #define LIBCRT_LIBCRT_H_
 
-#define CRT_VERSION "1.0.1"
-#define CRT_VERSION_NUM 010001L
+#define CRT_VERSION "1.0.3"
+#define CRT_VERSION_NUM 010003L
 
 #if !defined(CRT_MEM_ATEXIT) && \
     !defined(CRT_MEM_DBG_ALLOC) && \
@@ -40,7 +40,7 @@
 
 #include "crt_parse_macro.h"
 
-#define IMPORT_NOERROR
+#define CRT_IMPORT_NOERROR
 
 #include "crt_import.h"
 
