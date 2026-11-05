@@ -17,8 +17,8 @@
 #ifndef LIBCRT_LIBCRT_H_
 #define LIBCRT_LIBCRT_H_
 
-#define CRT_VERSION "1.0.4"
-#define CRT_VERSION_NUM 010004L
+#define CRT_VERSION "1.0.5"
+#define CRT_VERSION_NUM 010005L
 
 #if !defined(CRT_MEM_ATEXIT) && \
     !defined(CRT_MEM_DBG_ALLOC) && \

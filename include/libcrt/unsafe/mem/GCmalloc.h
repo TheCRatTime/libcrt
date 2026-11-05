@@ -38,7 +38,6 @@ typedef void (*GCDestructor)(void*);
 
 /* GCObject struct */
 typedef struct GCObject {
-  void* raw_ptr;
   struct GCObject* next;
   struct GCObject* next_root;
   struct GCObject* next_grey;
@@ -48,9 +47,25 @@ typedef struct GCObject {
   GCu8 metadata;
 } GCObject;
 
-extern GCObject* gGCRoots;
-extern GCObject* gGCGreys;
-extern GCObject* gGCAllPtrs;
+/* GC state struct */
+typedef struct GCState {
+  GCObject* roots;
+  GCObject* prev_grey;
+  GCObject* cur_grey;
+  GCObject* prev_sweep;
+  GCObject* cur_sweep;
+  GCObject* prev_prev_grey;
+  GCObject* greys;
+  GCObject* all_ptrs;
+  GCu8 state;
+  GCu8 changed;
+  GCu8 warn;
+  GCu8 last_chance;
+  GCu8 write_barrier_trigger;
+} GCState;
+
+/* Global GC state */
+extern GCState gGCState;
 
 /* Allocate memory.
    Return value is malloc() function like. */
@@ -64,28 +79,45 @@ void* GCMallocDep(size_t size, void* dep);
    Return value is malloc() function like. */
 void* GCMallocRaw(size_t size);
 
-/* Allocate memory and set dependency DEP.
-   Return value is malloc() function like. */
-void* GCMallocDep(size_t size, void* dep);
-
 /* Add dependency DEP to PTR */
 void GCAddDependency(void* ptr, void* dep);
 
+/* Safe write barrier for GC.
+   Use before you changing PTR to VAL */
+void GCWriteBarrier(void *ptr, void *val);
+
 /* Collect garbage in program */
-void RunGC(void);
+void RunGC(size_t steps);
 
 /* Register destructor that will be called
    when PTR is free */
 void GCRegDestructor(void* ptr, GCDestructor dsr);
 
+#define GC_START 0
+#define GC_DEPS  1
+#define GC_SWEEP 2
+
 #define GC_INIT() \
-  GCObject* gc__end_roots = gGCRoots
+  GCObject* gc__end_roots = gGCState.roots
 
 #define GC_DEINIT() \
-  gGCRoots = gc__end_roots
+  gGCState.roots = gc__end_roots
 
 #define GCreturn \
   GC_DEINIT(); return
+
+#define GC_SET_PTR(parent, field, child) do { \
+  GCWriteBarrier((void*)(parent), (void*)(child)); \
+  (parent)->field = (child); \
+} while (0)
+
+#define GC_FULL_RUN() do { \
+  int loops = 100; \
+  RunGC(1); \
+  while (gGCState.state != GC_START && loops-- > 0) { \
+    RunGC(999999); \
+  } \
+} while (0)
 
 #endif /* GC_MALLOC_GC_MALLOC_H_ */
 
@@ -112,9 +144,9 @@ void GCRegDestructor(void* ptr, GCDestructor dsr);
 #  define GC_THOUGHT(msg)     (void)msg
 # endif
 
-GCObject* gGCRoots = NULL;
-GCObject* gGCGreys = NULL;
-GCObject* gGCAllPtrs = NULL;
+GCState gGCState = {
+  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0
+};
 
 static GCObject* GCPushObj(GCObject* list, GCObject* obj) {
   if (!obj) {
@@ -132,8 +164,13 @@ static void GCPushGrey(GCObject* obj) {
     return;
   }
 
-  obj->next_grey = gGCGreys;
-  gGCGreys = obj;
+  obj->next_grey = gGCState.greys;
+  gGCState.greys = obj;
+  gGCState.changed = 1;
+}
+
+static void* GCGetRaw(GCObject* obj) {
+  return (void*)((char*)obj + sizeof(GCObject));
 }
 
 static void GCMarkWhite(GCObject* obj) {
@@ -178,16 +215,42 @@ static void GCInitMagic(GCObject* obj) {
   obj->magic[3] = GC_MAGIC4;
 }
 
-static void GCInitObject(GCObject* obj, void* ptr) {
+static void GCInitObject(GCObject* obj) {
   if (obj) {
-    GCMarkWhite(obj);
+    if (gGCState.state == GC_START) {
+      GCMarkWhite(obj);
+    } else {
+      GCMarkBlack(obj);
+    }
+    
     GCInitMagic(obj);
-    obj->raw_ptr = ptr;
     obj->next = NULL;
     obj->next_root = NULL;
     obj->next_grey = NULL;
     obj->next_dep = NULL;
     obj->destructor = NULL;
+  }
+}
+
+void GCWriteBarrier(void* ptr, void* val) {
+  GCObject* obj1 = NULL;
+  GCObject* obj2 = NULL;
+  
+  if (!ptr || !val) {
+    return;
+  }
+  
+  obj1 = (GCObject*)(void*)((char*)ptr - sizeof(GCObject));
+  obj2 = (GCObject*)(void*)((char*)val - sizeof(GCObject));
+
+  if (GCInvalidObj(obj1) || GCInvalidObj(obj2)) {
+    return;
+  }
+
+  if (obj1->metadata == GC_COLOR_BLACK && obj2->metadata == GC_COLOR_WHITE) {
+    GCMarkGrey(obj2);
+    GCPushGrey(obj2);
+    gGCState.write_barrier_trigger = 1;
   }
 }
 
@@ -205,14 +268,13 @@ static void* GCMallocLogic(size_t size) {
   }
 
   as_obj = (GCObject*)ret;
-  GCInitObject(as_obj, (void*)((char*)ret + sizeof(GCObject)));
-  gGCAllPtrs = GCPushObj(gGCAllPtrs, as_obj);
+  GCInitObject(as_obj);
+  gGCState.all_ptrs = GCPushObj(gGCState.all_ptrs, as_obj);
 
-  GC_MSG_PTR("GCMalloc: new pointer: %p\n",
-             (void*)((char*)ret + sizeof(GCObject)));
+  GC_MSG_PTR("GCMalloc: new pointer: %p\n", GCGetRaw(as_obj));
   GC_THOUGHT("GCMalloc: a new garbage?\n");
 
-  return (void*)((char*)ret + sizeof(GCObject));
+  return GCGetRaw(as_obj);
 }
 
 static void GCRegisterRoot(void* ptr) {
@@ -227,108 +289,83 @@ static void GCRegisterRoot(void* ptr) {
     return;
   }
 
-  obj->next_root = gGCRoots;
-  gGCRoots = obj;
+  obj->next_root = gGCState.roots;
+  gGCState.roots = obj;
 }
 
-static void GCUnregisterRoot(void* ptr) {
-  GCObject* prev = NULL;
-  GCObject* cur = gGCRoots;
-
-  if (!ptr || !cur) {
-    return;
+static int GCSweepStage(size_t steps) {
+  if (!gGCState.cur_sweep) {
+    gGCState.cur_sweep = gGCState.all_ptrs;
   }
 
-  while (cur != NULL) {
-    if (cur->raw_ptr == ptr) {
-      if (!prev) {
-        gGCRoots = cur->next_root;
-      } else {
-        prev->next_root = cur->next_root;
-      }
-      break;
-    }
+  while (gGCState.cur_sweep != NULL && steps-- > 0) {
+    if (gGCState.cur_sweep->metadata != GC_COLOR_BLACK) {
+      GCObject* saved = gGCState.cur_sweep;
 
-    if (!prev) {
-      gGCRoots = cur;
-    }
-
-    prev = cur;
-    cur = cur->next_root;
-  }
-
-  if (!prev) {
-    gGCRoots = NULL;
-  }
-}
-
-static void GCSweepStage(void) {
-  GCObject* prev = NULL;
-  GCObject* cur = gGCAllPtrs;
-
-  while (cur != NULL) {
-    if (cur->metadata != GC_COLOR_BLACK) {
-      GCObject* saved = cur;
-
-      GC_MSG_PTR("GC: pointer %p ", cur->raw_ptr);
+      GC_MSG_PTR("GC: pointer %p ", GCGetRaw(gGCState.cur_sweep));
       
 #ifdef GC_THOUGHTS
       GC_THOUGHT("comes to hell\n");
 #else
       GC_MSG("haven't roots\n");
 #endif
-      cur = cur->next;
-      if (prev) {
-        prev->next = cur;
+      gGCState.cur_sweep = gGCState.cur_sweep->next;
+      if (gGCState.prev_sweep) {
+        gGCState.prev_sweep->next = gGCState.cur_sweep;
       }
 
       if (saved->destructor) {
-        saved->destructor(saved->raw_ptr);
+        saved->destructor(GCGetRaw(saved));
       }
 
       free(saved);
       continue;
     }
   
-    GCMarkWhite(cur);
-    if (!prev) {
-      gGCAllPtrs = cur;
+    GCMarkWhite(gGCState.cur_sweep);
+    if (!gGCState.prev_sweep) {
+      gGCState.all_ptrs = gGCState.cur_sweep;
     }
 
-    prev = cur;
-    cur = cur->next;
+    gGCState.prev_sweep = gGCState.cur_sweep;
+    gGCState.cur_sweep = gGCState.cur_sweep->next;
   }
 
-  if (prev == NULL) {
-    gGCAllPtrs = NULL;
+  if (gGCState.cur_sweep) {
+    return 1;
   }
+
+  if (gGCState.prev_sweep == NULL) {
+    gGCState.all_ptrs = NULL;
+  }
+
+  gGCState.cur_sweep = NULL;
+  gGCState.prev_sweep = NULL;
+
+  return 0;
 }
 
-static int GCDepsHandle(GCObject* obj) {
+static void GCDepsHandle(GCObject* obj) {
   GCObject* dep = NULL;
-  int changed = 0;
   
-  if (!obj) {
-    return 0;
+  if (!obj || !obj->next_dep) {
+    return;
   }
 
   dep = obj->next_dep;
 
   if (dep->metadata == GC_COLOR_BLACK) {
     GC_MSG("GC: cycle dependency blocked\n");
-    return 0;
+    return;
   }
   
   if (dep->next_dep && dep->next_dep->metadata != GC_COLOR_BLACK) {
     GCPushGrey(dep->next_dep);
-    changed = 1;
   }
 
-  GC_MSG_PTR("GC: dependency %p changed to black.\n", dep->raw_ptr);
+  GC_MSG_PTR("GC: dependency %p changed to black.\n", GCGetRaw(dep));
 
   GCMarkBlack(dep);
-
-  return changed;
 }
 
 void GCAddDependency(void* ptr, void* dep) {
@@ -356,71 +393,126 @@ void GCAddDependency(void* ptr, void* dep) {
     free = obj1;
   }
 
+  GCWriteBarrier(free, dep);
   free->next_dep = obj2;
 }
 
 #define GC_WARN_LIMIT 10
 
-static void GCDepsStage(void) {
-  int changed = 0;
-  GCObject* cur = gGCGreys;
-  GCObject* prev = NULL;
-  int warn = 0;
+static void GCSavePrevPrev(GCObject* cur) {
+  gGCState.prev_prev_grey = gGCState.prev_grey;
+  gGCState.prev_grey = cur->next_grey;
+}
 
-  while (cur != NULL) {
-    if (cur->metadata == GC_COLOR_BLACK) {
-      if (warn >= GC_WARN_LIMIT) {
-        GC_MSG("GC: I get in cycle dependency\n");
-        GC_THOUGHT("GC: bug or you?\n");
+static int GCDepsStage(size_t steps) {
+  if (!gGCState.cur_grey) {
+    gGCState.cur_grey = gGCState.greys;
+  }
+  
+  while (gGCState.cur_grey != NULL && steps-- > 0) {
+    if (gGCState.cur_grey->metadata == GC_COLOR_BLACK) {
+      if (gGCState.last_chance) {
+        gGCState.cur_grey = gGCState.prev_prev_grey;
+      }
+
+      if (gGCState.cur_grey == NULL) {
+        GC_MSG("GC: last chance unused\n");
         break;
       }
-      
-      GC_MSG_PTR("GC: pointer %p already black\n", cur->raw_ptr);
-      cur = cur->next_grey;
-      warn++;
 
-      if (prev) {
-        cur = prev;
+      gGCState.last_chance = 0;
+      gGCState.prev_prev_grey = NULL;
+      
+      if (gGCState.warn >= GC_WARN_LIMIT) {
+        GC_MSG("GC: I get in cycle dependency\n");
+        GC_THOUGHT("GC: bug or you?\n");
+        gGCState.last_chance = 1;
+        continue;
       }
+      
+      GC_MSG_PTR("GC: pointer %p already black\n",
+                 GCGetRaw(gGCState.cur_grey));
+      gGCState.warn++;
+
+      gGCState.cur_grey = gGCState.prev_grey ? gGCState.prev_grey
+                                             : gGCState.cur_grey->next_grey;
 
       continue;
     }
+
+    gGCState.changed = 0;
+    gGCState.warn = 0;
     
-    changed = 0;
-    warn = 0;
-    
-    if (cur->next_dep != NULL && cur->next_dep->metadata == GC_COLOR_WHITE) {
-      prev = cur->next_grey;
-      changed = GCDepsHandle(cur);
+    if (gGCState.cur_grey->next_dep != NULL &&
+        gGCState.cur_grey->next_dep->metadata == GC_COLOR_WHITE) {
+      GCSavePrevPrev(gGCState.cur_grey);
+      GCDepsHandle(gGCState.cur_grey);
     }
 
-    GC_MSG_PTR("GC: pointer %p keep alive\n", cur->raw_ptr);
+    GC_MSG_PTR("GC: pointer %p keep alive\n", GCGetRaw(gGCState.cur_grey));
 
-    GCMarkBlack(cur);
-    cur = (changed ? gGCGreys : cur->next_grey);
+    GCMarkBlack(gGCState.cur_grey);
+    gGCState.cur_grey = (gGCState.changed ? gGCState.greys
+                                          : gGCState.cur_grey->next_grey);
   }
 
-  gGCGreys = NULL;
+  if (gGCState.cur_grey) {
+    return 1;
+  }
+
+  gGCState.greys = NULL;
+  gGCState.cur_grey = NULL;
+  gGCState.prev_grey = NULL;
+  gGCState.prev_prev_grey = NULL;
+
+  return 0;
 }
 
-void RunGC(void) {
-  /* =-=-=-=-=-= TRI-COLOR GC =-=-=-=-=-= */
+static void GCRootMarkStage(void) {
   GCObject* cur = NULL;
-
-  GC_MSG("GC: running...\n");
-
-  /* 1. Mark roots */
-  cur = gGCRoots;
+  cur = gGCState.roots;
   for (; cur != NULL; cur = cur->next_root) {
     GCMarkGrey(cur);
     GCPushGrey(cur);
   }
+}
 
-  /* 2. Dependencies mark */
-  GCDepsStage();
+void RunGC(size_t steps) {
+  int cont = 0;
+  
+  /* =-=-=-=-=-= INCREMENTAL TRI-COLOR GC =-=-=-=-=-= */
+  GC_MSG("GC: running...\n");
 
-  /* 3. Sweep stage. */
-  GCSweepStage();
+  if (gGCState.state == GC_SWEEP && gGCState.write_barrier_trigger) {
+    gGCState.state = GC_DEPS;
+    gGCState.cur_sweep = NULL;
+    gGCState.prev_sweep = NULL;
+  }
+
+  switch (gGCState.state) {
+    case GC_START:
+    default:
+      /* 1. Mark roots */
+      GCRootMarkStage();
+      gGCState.state = GC_DEPS;
+      return;
+    case GC_DEPS:
+      /* 2. Dependencies mark */
+      cont = GCDepsStage(steps);
+      if (!cont) {
+        gGCState.state = GC_SWEEP;
+      }
+      
+      return;
+    case GC_SWEEP:
+      /* 3. Sweep stage. */
+      cont = GCSweepStage(steps);
+      if (!cont) {
+        gGCState.state = GC_START;
+      }
+      
+      return;
+  }
 
   GC_MSG("GC: end of GC log\n");
   GC_THOUGHT("GC: garbage not stops.\n");
