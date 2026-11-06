@@ -24,6 +24,11 @@ static void TestFunc(void) {
   ptr2 = (HardStruct*)GCMallocChild(sizeof(HardStruct), ptr1); /* No registering to roots */
   garbage = (HardStruct*)GCMalloc(sizeof(HardStruct)); /* unused */
 
+  if (!ptr1 || !ptr2 || !garbage) {
+    /* GC automatically free objects that was allocated. */
+    GCreturn;
+  }
+
   /* If you want, you can set destructor, for example: */
   GCRegDestructor(ptr1, PtrHandler);
   GCRegDestructor(ptr2, PtrHandler);
@@ -31,6 +36,7 @@ static void TestFunc(void) {
 
   GCAddDependency(ptr2, ptr1);
 
+  /* For set using GC_SET_PTR */
   GC_SET_PTR(ptr1, cycle_dep, ptr2);
   GC_SET_PTR(ptr2, cycle_dep, ptr1);
   GC_SET_PTR(garbage, cycle_dep, ptr1);
