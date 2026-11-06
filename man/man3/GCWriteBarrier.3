@@ -12,7 +12,7 @@ pointer that must keep alive\&.
 .nf
 .RS 4
 SomeStruct* user = (SomeStruct*)GCMalloc(sizeof(SomeStruct));
-SomeStruct* child = (SomeStruct*)GCMallocRaw(sizeof(SomeStruct));
+SomeStruct* child = (SomeStruct*)GCMallocChild(sizeof(SomeStruct), user);
 
 if (!user || !child) {
   /* \&.\&.\&. */

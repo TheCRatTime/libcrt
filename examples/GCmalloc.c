@@ -21,7 +21,7 @@ static void TestFunc(void) {
   GC_INIT();
 
   ptr1 = (HardStruct*)GCMalloc(sizeof(HardStruct));
-  ptr2 = (HardStruct*)GCMallocRaw(sizeof(HardStruct)); /* No registering to roots */
+  ptr2 = (HardStruct*)GCMallocChild(sizeof(HardStruct), ptr1); /* No registering to roots */
   garbage = (HardStruct*)GCMalloc(sizeof(HardStruct)); /* unused */
 
   /* If you want, you can set destructor, for example: */
@@ -29,20 +29,15 @@ static void TestFunc(void) {
   GCRegDestructor(ptr2, PtrHandler);
   GCRegDestructor(garbage, PtrHandler);
 
-  GCAddDependency(ptr1, ptr2);
   GCAddDependency(ptr2, ptr1);
 
-  ptr1->cycle_dep = ptr2;
-  ptr2->cycle_dep = ptr1;
-  garbage->cycle_dep = ptr1;
+  GC_SET_PTR(ptr1, cycle_dep, ptr2);
+  GC_SET_PTR(ptr2, cycle_dep, ptr1);
+  GC_SET_PTR(garbage, cycle_dep, ptr1);
 
-  RunGC();
-
-  GCUnregisterRoot(garbage);
-
-  RunGC();
+  GC_FULL_RUN();
   
-  GCreturn;
+  GC_DEINIT();
 }
 
 int main(void) {
@@ -51,8 +46,8 @@ int main(void) {
   TestFunc();
   
   printf("RunGC()\n");
-  
-  RunGC();
+
+  GC_FULL_RUN();
 
   return 0;
 }

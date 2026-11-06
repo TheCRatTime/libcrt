@@ -9,7 +9,7 @@
 This function register to \fIptr\fR special function that will be called
 when \fIptr\fR is garbage\&.
 .SH NOTE
-Callback function prototype must be \fBvoid (\fR*\fB)(void\fR*\fB)\fR\&.
+Callback function prototype must be \fBvoid (\fR*\fB)(void\fR*\fB)\fR or \fBGCDestructor\fR(3)\&.
 .SH EXAMPLE
 .nf
 .RS 4
@@ -33,5 +33,5 @@ GCRegDestructor(special, Destructor);
 .SH AUTHORS
 Project and man\-page: TheCRatTime\&.
 .SH SEE ALSO
-\fBmalloc\fR(3), \fBGCMalloc\fR(3), \fBGCMallocRaw\fR(3), \fBGCMallocDep\fR(3),
+\fBmalloc\fR(3), \fBGCMalloc\fR(3), \fBGCMallocChild\fR(3), \fBGCMallocDep\fR(3),
 \fBGCmalloc\fR(3), \fBGCWriteBarrier\fR(3), \fBRunGC\fR(3)

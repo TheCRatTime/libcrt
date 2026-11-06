@@ -13,12 +13,12 @@ Pointer won'\&t be freed while \fIptr\fR not freed\&.
 .RS 4
 /* typedef struct User {\&.\&.\&.} User; \&.\&.\&. */
 User* parent = (User*)GCMalloc(sizeof(User));
-User* child = (User*)GCMallocRaw(sizeof(User));
+User* child = (User*)GCMallocChild(sizeof(User), parent);
 if (!parent || !child) {
   /* \&.\&.\&. */
 }
 
-/* need to link child to parent */
+/* need to link parent to child*/
 GCAddDependency(parent, child);
 
 /* Using special macro: */

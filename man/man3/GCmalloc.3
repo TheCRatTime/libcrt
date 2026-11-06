@@ -24,7 +24,7 @@ This is a incremental Tri\-color GC for C, written in C\&. API has
 .br
 \fB\-\-\fR \fBGCMallocDep\fR \- allocate and link return pointer with \fIdep\fR
 .br
-\fB\-\-\fR \fBGCMallocRaw\fR \- allocate memory, but not set to roots
+\fB\-\-\fR \fBGCMallocChild\fR \- allocate memory, but set to *parent* as dependency pointer
 .br
 \fB\-\-\fR \fBGCAddDependency\fR \- add to \fIptr\fR dependency \fIdep\fR\&.
 .br
@@ -51,7 +51,7 @@ Project and man\-page: TheCRatTime\&.
 .SH SEE ALSO
 \fBGCu8\fR(3type), \fBGCDestructor\fR(3), \fBGCObject\fR(3type),
 \fBGCState\fR(3type), \fBgGCState\fR(3), \fBGCMalloc\fR(3),
-\fBGCMallocDep\fR(3), \fBGCMallocRaw\fR(3), \fBGCAddDependency\fR(3),
+\fBGCMallocDep\fR(3), \fBGCMallocChild\fR(3), \fBGCAddDependency\fR(3),
 \fBGCWriteBarrier\fR(3), \fBRunGC\fR(3), \fBGCRegDestructor\fR(3),
 \fBGC_START\fR,(3), \fBGC_INIT\fR(3), \fBGC_DEINIT\fR(3), \fBGCreturn\fR(3),
 \fBGC_SET_PTR\fR(3), \fBGC_FULL_RUN\fR(3)
