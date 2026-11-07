@@ -32,7 +32,7 @@
 #ifdef CRT_NOT_USE_NAMESPACE
 # define ATEXIT_INC_PATH      "unsafe/mem/atexit.h"
 # define DBG_ALLOC_INC_PATH   "unsafe/mem/dbg_alloc.h"
-# define GC_MALLOC_INC_PATH   "unsafe/mem/GCmalloc.h"
+# define GC_MALLOC_INC_PATH   "unsafe/mem/GCMalloc.h"
 # define BLOCK_ALLOC_INC_PATH "unsafe/mem/block_alloc.h"
 # define ARENA_INC_PATH       "unsafe/mem/arena.h"
 # define HEX_INC_PATH         "unsafe/encodings/hex.h"
@@ -41,7 +41,7 @@
 #else
 # define ATEXIT_INC_PATH      "mem/atexit.h"
 # define DBG_ALLOC_INC_PATH   "mem/dbg_alloc.h"
-# define GC_MALLOC_INC_PATH   "mem/GCmalloc.h"
+# define GC_MALLOC_INC_PATH   "mem/GCMalloc.h"
 # define BLOCK_ALLOC_INC_PATH "mem/block_alloc.h"
 # define ARENA_INC_PATH       "mem/arena.h"
 # define HEX_INC_PATH         "encodings/hex.h"

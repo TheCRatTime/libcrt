@@ -2,27 +2,40 @@
 .\" --             Do not edit.            --
 .\" --     Copyright (C) TheCRatTime =)    --
 .\" --      Begin generated content:       --
-.TH "README" "1" "2026\-10\-18" "TheCRatTime"
+.TH "README" "1" "2026\-11\-07" "TheCRatTime"
 .SH LIBCRT
 \fBlibcrt\fR \- C RunTime library\&.
 .PP
 .SH DESCRIPTION
-This is a union of libraries with namespaces, import system\&.
+This is a union of TheCRatTime'\&s libraries with namespaces and import system\&.
 .PP
 .SH FEATURES
 .br
-\fB\-\-\fR \fBNamespace\fR: all of functions starts with "Crt",
-to disable it, you can define \fBCRT_NOT_USE_NAMESPACE\fR
-and include headers from \fBunsafe/\fR directory\&.
+\fB\-\-\fR \fBNamespace\fR: all of functions starts with "Crt", to disable it, you can
+define \fBCRT_NOT_USE_NAMESPACE\fR and include headers
+from \fBunsafe/\fR directory\&.
+.PP
 .br
-\fB\-\-\fR \fBImport System\fR: e\&.g\&. for include \fBmem/atexit\&.h\fR you
-don'\&t write \fBlibcrt/mem/atexit\&.h\fR, you can define \fBCRT_IMPORT\fR
-(maximal value: 6) with \fB"mem/atexit\&.h"\fR and only include
-\fBlibcrt/crt\&.h\fR or \fBlibcrt/crt_import\&.h\fR\&.
+\fB\-\-\fR \fBImport System\fR: e\&.g\&. for include \fBmem/atexit\&.h\fR you don'\&t write
+\fBlibcrt/mem/atexit\&.h\fR, you can define \fBCRT_IMPORT\fR (maximal value: 6)
+with \fB"mem/atexit\&.h"\fR and only include \fBlibcrt/crt\&.h\fR or
+\fBlibcrt/crt_import\&.h\fR\&.
+.PP
 .br
 \fB\-\-\fR \fBC89\fR/\fBANSI C\fR library code standard\&.
 .br
 \fB\-\-\fR \fBstb\-style\fR library
+.PP
+.SH PROVIDES\&.\&.\&.
+The \fBlibcrt\fR provides some tools:
+.br
+\fB\-\-\fR \fBArena and Allocators\fR: you can found arena, debug and block allocator\&.
+.br
+\fB\-\-\fR \fBRLE and HEX\fR: tools that can compress data and encode string to hexadecimal format
+.br
+\fB\-\-\fR \fBError handler\fR: \fBcerrors\fR with commands \fBcerrors\&.New(\&.\&.\&.)\fR\&.
+.PP
+You can found project by link https://github\&.com/TheCRatTime/project_name\&.
 .PP
 .SH BUILD
 Needed:
@@ -43,7 +56,7 @@ make
 .PP
 .PP
 .SH EXAMPLES
-You can found examples in examples/ directory\&.
+You can found examples in \fBexamples/\fR directory\&.
 .PP
 .SH DOCUMENTATION
 See: \fBEXAMPLES\fR\&.

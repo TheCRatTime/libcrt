@@ -1,6 +1,11 @@
+/* gc_test.c - test GC garbage collection.
+   for checks using dbg_alloc:
+       https://github.com/TheCRatTime/dbg_alloc/
+*/
+
 #define CRT_SOURCE
 #define CRT_NOT_USE_NAMESPACE
-#define CRT_IMPORT "unsafe/mem/GCmalloc.h"
+#define CRT_IMPORT "unsafe/mem/GCMalloc.h"
 #include "../include/libcrt/crt.h"
 
 #include <stdio.h>
@@ -21,7 +26,7 @@ static void TestFunc(void) {
   GC_INIT();
 
   ptr1 = (HardStruct*)GCMalloc(sizeof(HardStruct));
-  ptr2 = (HardStruct*)GCMallocChild(sizeof(HardStruct), ptr1); /* No registering to roots */
+  ptr2 = (HardStruct*)GCMalloc(sizeof(HardStruct)); /* No registering to roots */
   garbage = (HardStruct*)GCMalloc(sizeof(HardStruct)); /* unused */
 
   if (!ptr1 || !ptr2 || !garbage) {
@@ -34,14 +39,7 @@ static void TestFunc(void) {
   GCRegDestructor(ptr2, PtrHandler);
   GCRegDestructor(garbage, PtrHandler);
 
-  GCAddDependency(ptr2, ptr1);
-
-  /* For set using GC_SET_PTR */
-  GC_SET_PTR(ptr1, cycle_dep, ptr2);
-  GC_SET_PTR(ptr2, cycle_dep, ptr1);
-  GC_SET_PTR(garbage, cycle_dep, ptr1);
-
-  GC_FULL_RUN();
+  RunGC();
   
   GC_DEINIT();
 }
@@ -53,7 +51,7 @@ int main(void) {
   
   printf("RunGC()\n");
 
-  GC_FULL_RUN();
+  RunGC();
 
   return 0;
 }
