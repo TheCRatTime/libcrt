@@ -27,6 +27,8 @@
 # define CRT_ENCODINGS_HEX
 # define CRT_ENCODINGS_RLE
 # define CRT_ERRORS_CERRORS
+# define CRT_TOOLS_EVAL
+# define CRT_TOOLS_HASHMAP
 #endif
 
 #ifdef CRT_NOT_USE_NAMESPACE
@@ -38,6 +40,8 @@
 # define HEX_INC_PATH         "unsafe/encodings/hex.h"
 # define RLE_INC_PATH         "unsafe/encodings/RLE.h"
 # define CERRORS_INC_PATH     "unsafe/errors/cerrors.h"
+# define EVAL_INC_PATH        "unsafe/tools/eval.h"
+# define HASHMAP_INC_PATH     "unsafe/tools/hashmap.h"
 #else
 # define ATEXIT_INC_PATH      "mem/atexit.h"
 # define DBG_ALLOC_INC_PATH   "mem/dbg_alloc.h"
@@ -47,6 +51,8 @@
 # define HEX_INC_PATH         "encodings/hex.h"
 # define RLE_INC_PATH         "encodings/RLE.h"
 # define CERRORS_INC_PATH     "errors/cerrors.h"
+# define EVAL_INC_PATH        "tools/eval.h"
+# define HASHMAP_INC_PATH     "tools/hashmap.h"
 #endif
 
 #ifdef CRT_SOURCE
@@ -65,6 +71,8 @@
 # define LIBHEX_SOURCE
 # define RLE_SOURCE
 # define CERRORS_SOURCE
+# define EVAL_SOURCE
+# define HASHMAP_SOURCE
 #endif
 
 #ifdef CRT_MEM_ATEXIT
@@ -97,4 +105,12 @@
 
 #ifdef CRT_ERRORS_CERRORS
 # include CERRORS_INC_PATH
+#endif
+
+#ifdef CRT_TOOLS_EVAL
+# include EVAL_INC_PATH
+#endif
+
+#ifdef CRT_TOOLS_HASHMAP
+# include HASHMAP_INC_PATH
 #endif

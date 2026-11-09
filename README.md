@@ -22,6 +22,7 @@ The **libcrt** provides some tools:
 - **Arena and Allocators**: you can found arena, debug and block allocator.
 - **RLE and HEX**: tools that can compress data and encode string to hexadecimal format
 - **Error handler**: **cerrors** with commands **cerrors.New(...)**.
+- **Hashmap and evaulator**: there is hashmap and **CrtEval()**
 
 You can found project by link `https://github.com/TheCRatTime/project_name`.
 
