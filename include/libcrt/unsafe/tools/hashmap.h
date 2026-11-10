@@ -23,7 +23,7 @@
 #define HASHMAP_REHASH     0.75
 
 typedef struct hashmap_node {
-  const char* key;
+  char* key;
   void* value;
   struct hashmap_node* next;
 } hashmap_node;
@@ -110,7 +110,6 @@ hashmap* create_hashmap(size_t cap) {
 }
 
 void* hashmap_get(hashmap* map, const char* key) {
-  void* ret = NULL;
   hashmap_node* cur = NULL;
   
   map->get_success = 0;
@@ -133,7 +132,6 @@ void* hashmap_get(hashmap* map, const char* key) {
 }
 
 void hashmap_set(hashmap* map, const char* key, void* val) {
-  void* ret = NULL;
   hashmap_node* cur = NULL;
   
   if (!map || !key) { return; }
@@ -203,13 +201,13 @@ void free_hashmap(hashmap* map) {
   for (; i < map->cap; i++) {
     hashmap_node* cur = map->nodes[i].next;
     
-    free((void*)map->nodes[i].key);
+    free(map->nodes[i].key);
 
     if (!cur) { continue; }
 
     while (cur) {
       hashmap_node* next = cur->next;
-      free((void*)cur->key);
+      free(cur->key);
       free(cur);
       cur = next;
     }
@@ -220,7 +218,6 @@ void free_hashmap(hashmap* map) {
 }
 
 static int hashmap_rehash(hashmap* map) {
-  size_t old_cap = 0;
   size_t i = 0;
   hashmap* new_map = NULL;
   
