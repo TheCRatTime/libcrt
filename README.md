@@ -23,6 +23,7 @@ The **libcrt** provides some tools:
 - **RLE and HEX**: tools that can compress data and encode string to hexadecimal format
 - **Error handler**: **cerrors** with commands **cerrors.New(...)**.
 - **Hashmap and evaulator**: there is hashmap and **CrtEval()**
+- **Testing module**: write unit-tests with **check_cond()**, no **assert()**
 
 You can found project by link `https://github.com/TheCRatTime/project_name`.
 
