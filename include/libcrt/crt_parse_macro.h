@@ -29,6 +29,7 @@
 # define CRT_ERRORS_CERRORS
 # define CRT_TOOLS_EVAL
 # define CRT_TOOLS_HASHMAP
+# define CRT_TOOLS_TESTING
 #endif
 
 #ifdef CRT_NOT_USE_NAMESPACE
@@ -42,6 +43,7 @@
 # define CERRORS_INC_PATH     "unsafe/errors/cerrors.h"
 # define EVAL_INC_PATH        "unsafe/tools/eval.h"
 # define HASHMAP_INC_PATH     "unsafe/tools/hashmap.h"
+# define TESTING_INC_PATH     "unsafe/tools/testing.h"
 #else
 # define ATEXIT_INC_PATH      "mem/atexit.h"
 # define DBG_ALLOC_INC_PATH   "mem/dbg_alloc.h"
@@ -53,6 +55,7 @@
 # define CERRORS_INC_PATH     "errors/cerrors.h"
 # define EVAL_INC_PATH        "tools/eval.h"
 # define HASHMAP_INC_PATH     "tools/hashmap.h"
+# define TESTING_INC_PATH     "tools/testing.h"
 #endif
 
 #ifdef CRT_SOURCE
@@ -113,4 +116,8 @@
 
 #ifdef CRT_TOOLS_HASHMAP
 # include HASHMAP_INC_PATH
+#endif
+
+#ifdef CRT_TOOLS_TESTING
+# include TESTING_INC_PATH
 #endif
