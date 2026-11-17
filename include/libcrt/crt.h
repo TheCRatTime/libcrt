@@ -17,8 +17,8 @@
 #ifndef LIBCRT_LIBCRT_H_
 #define LIBCRT_LIBCRT_H_
 
-#define CRT_VERSION "1.0.13"
-#define CRT_VERSION_NUM 010013L
+#define CRT_VERSION "1.0.14"
+#define CRT_VERSION_NUM 010014L
 
 #if !defined(CRT_MEM_ATEXIT) && \
     !defined(CRT_MEM_DBG_ALLOC) && \
@@ -31,6 +31,7 @@
     !defined(CRT_TOOLS_EVAL) && \
     !defined(CRT_TOOLS_HASHMAP) && \
     !defined(CRT_TOOLS_TESTING) && \
+    !defined(CRT_TOOLS_IWASHERE) && \
     !defined(CRT_ENABLE_ALL) && \
     !defined(CRT_IMPORT) && \
     !defined(CRT_IMPORT2) && \

@@ -30,6 +30,7 @@
 # define CRT_TOOLS_EVAL
 # define CRT_TOOLS_HASHMAP
 # define CRT_TOOLS_TESTING
+# define CRT_TOOLS_IWASHERE
 #endif
 
 #ifdef CRT_NOT_USE_NAMESPACE
@@ -44,6 +45,7 @@
 # define EVAL_INC_PATH        "unsafe/tools/eval.h"
 # define HASHMAP_INC_PATH     "unsafe/tools/hashmap.h"
 # define TESTING_INC_PATH     "unsafe/tools/testing.h"
+# define IWASHERE_INC_PATH    "unsafe/tools/iwashere.h"
 #else
 # define ATEXIT_INC_PATH      "mem/atexit.h"
 # define DBG_ALLOC_INC_PATH   "mem/dbg_alloc.h"
@@ -56,6 +58,7 @@
 # define EVAL_INC_PATH        "tools/eval.h"
 # define HASHMAP_INC_PATH     "tools/hashmap.h"
 # define TESTING_INC_PATH     "tools/testing.h"
+# define IWASHERE_INC_PATH    "tools/iwashere.h"
 #endif
 
 #ifdef CRT_SOURCE
@@ -120,4 +123,8 @@
 
 #ifdef CRT_TOOLS_TESTING
 # include TESTING_INC_PATH
+#endif
+
+#ifdef CRT_TOOLS_IWASHERE
+# include IWASHERE_INC_PATH
 #endif
