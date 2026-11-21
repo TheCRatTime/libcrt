@@ -31,6 +31,7 @@
 # define CRT_TOOLS_HASHMAP
 # define CRT_TOOLS_TESTING
 # define CRT_TOOLS_IWASHERE
+# define CRT_TOOLS_BETTER
 #endif
 
 #ifdef CRT_NOT_USE_NAMESPACE
@@ -46,6 +47,7 @@
 # define HASHMAP_INC_PATH     "unsafe/tools/hashmap.h"
 # define TESTING_INC_PATH     "unsafe/tools/testing.h"
 # define IWASHERE_INC_PATH    "unsafe/tools/iwashere.h"
+# define BETTER_INC_PATH      "unsafe/tools/better.h"
 #else
 # define ATEXIT_INC_PATH      "mem/atexit.h"
 # define DBG_ALLOC_INC_PATH   "mem/dbg_alloc.h"
@@ -59,6 +61,7 @@
 # define HASHMAP_INC_PATH     "tools/hashmap.h"
 # define TESTING_INC_PATH     "tools/testing.h"
 # define IWASHERE_INC_PATH    "tools/iwashere.h"
+# define BETTER_INC_PATH      "tools/better.h"
 #endif
 
 #ifdef CRT_SOURCE
@@ -79,6 +82,7 @@
 # define CERRORS_SOURCE
 # define EVAL_SOURCE
 # define HASHMAP_SOURCE
+# define BETTER_SOURCE
 #endif
 
 #ifdef CRT_MEM_ATEXIT
@@ -127,4 +131,8 @@
 
 #ifdef CRT_TOOLS_IWASHERE
 # include IWASHERE_INC_PATH
+#endif
+
+#ifdef CRT_TOOLS_BETTER
+# include BETTER_INC_PATH
 #endif

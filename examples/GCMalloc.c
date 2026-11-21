@@ -1,8 +1,3 @@
-/* gc_test.c - test GC garbage collection.
-   for checks using dbg_alloc:
-       https://github.com/TheCRatTime/dbg_alloc/
-*/
-
 #define CRT_SOURCE
 #define CRT_NOT_USE_NAMESPACE
 #define CRT_IMPORT "unsafe/mem/GCMalloc.h"

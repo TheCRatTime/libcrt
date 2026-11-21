@@ -14,7 +14,7 @@ from **unsafe/** directory.
 with **"mem/atexit.h"** and only include **libcrt/crt.h** or
 **libcrt/crt_import.h**.
 
-- **C89**/**ANSI C** library code standard.
+- **C89**/**ANSI C**: FULL library written in this standard.
 - **stb-style** library
 
 ### Provides...
@@ -24,6 +24,9 @@ The **libcrt** provides some tools:
 - **Error handler**: **cerrors** with commands **cerrors.New(...)**.
 - **Hashmap and evaulator**: there is hashmap and **CrtEval()**
 - **Testing module**: write unit-tests with **check_cond()**, no **assert()**
+- **I was here**: printf-debug project, where you writes **iwashere()** for understand,
+  where your program falling.
+- **better**: project that makes your code better.
 
 You can found project by link `https://github.com/TheCRatTime/project_name`.
 
